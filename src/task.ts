@@ -66,5 +66,13 @@ export const taskTwo: TasksType[] = [
     check: true,
     content: "Firebaseにデプロイする",
   },
+  {
+    check: true,
+    content: "FirebaseにGitHub Actionsを設定する",
+  },
+  {
+    check: false,
+    content: "Jestとreact-testing-libraryを導入する",
+  },
 ];
 
