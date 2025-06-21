@@ -71,8 +71,16 @@ export const taskTwo: TasksType[] = [
     content: "FirebaseにGitHub Actionsを設定する",
   },
   {
-    check: false,
-    content: "Jestとreact-testing-libraryを導入する",
+    check: true,
+    content: "vitestとreact-testing-libraryを導入する",
   },
+  {
+    check: true,
+    content: "「タイトル「学習記録一覧」が表示されていること」「フォームに学習内容と時間を入力して登録ボタンを押すと新たに記録が追加されていること」「削除ボタンを押すと学習記録が削除される」「入力をしないで登録を押すとエラーが表示される」の自動テストを作成する",
+  },
+  {
+    check: true,
+    content: "パイプラインにCIを追加する",
+  }
 ];
 

@@ -27,15 +27,10 @@ INSERT INTO study_record (id, title, time) VALUES
  (gen_random_uuid(),'test3', 3);
 ```
 
-Supabase で必要なパッケージをインストール
-
-```
-npm i @supabase/supabase-js
-```
-
 Supabase からテーブル型を取得して database.types.ts を作成
 
 ```
+npm i @supabase/supabase-js
 npx supabase login
 npx supabase init
 npx supabase gen types --lang=typescript --project-id "project-idを入力" --schema public > database.types.ts
@@ -59,6 +54,13 @@ firebase init hosting
 npm run build
 firebase deploy
 firebase init hosting:github
+```
+
+テスト用パッケージインストール
+
+```
+npm i -D vitest @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event jsdom
+npm i -D @vitest/ui //任意
 ```
 
 ## 使用技術

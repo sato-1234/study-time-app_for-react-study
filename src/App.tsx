@@ -4,7 +4,7 @@ import {
   createStudy,
   deleteStudy,
   getStudy,
-} from "../modules/study/study.repository";
+} from "./modules/study/study.repository";
 
 type RecordType = {
   id: string;
@@ -115,16 +115,18 @@ function App() {
         {loading ? (
           <div>Loading...</div>
         ) : list.length >= 1 ? (
-          <ul>
+          <ul data-testid="study-list">
             {list.map((v) => (
-              <li key={v.id}>
-                {v.title}：{v.time}
+              <li key={v.id} data-id={v.id}>
+                <span>
+                  {v.title}：{v.time}
+                </span>
                 <button onClick={() => deleteList(v.id)}>削除</button>
               </li>
             ))}
           </ul>
         ) : (
-          ""
+          <div>まだ学習記録を登録していません。</div>
         )}
 
         <form onSubmit={handleSubmit}>
@@ -155,7 +157,13 @@ function App() {
           <p>入力されている学習内容：{title}</p>
           <p>入力されている学習時間：{studyTime}時間</p>
           <button>登録</button>
-          {error !== "" ? <div style={{ color: "red" }}>{error}</div> : ""}
+          {error !== "" ? (
+            <div data-testid="error-message" style={{ color: "red" }}>
+              {error}
+            </div>
+          ) : (
+            ""
+          )}
         </form>
 
         <p>合計勉強時間：{total}/1000（h）</p>

@@ -18,6 +18,8 @@ export async function createStudy(title: string, time: number) {
   return data;
 }
 
+// テーブルが空になると、IDのAutoIncrementはリセットされない
+// 今回はUUIDのため考慮なし
 export async function deleteStudy(id: string) {
   const { data, error } = await supabase.from("study_record").delete().eq("id", id).select().single(); 
   if (error !== null) throw new Error(error.message);
