@@ -81,6 +81,10 @@ export const taskTwo: TasksType[] = [
   {
     check: true,
     content: "パイプラインにCIを追加する",
+  },
+  {
+    check: true,
+    content: "React+TypeScriptの開発環境をViteで用意し、Fireabseにデプロイし、vitestとreact-testing-libraryを導入しテストファイル作成、Github Actions(Push)でCI/CDする",
   }
 ];
 
