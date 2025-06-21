@@ -143,10 +143,11 @@ describe("Appコンポーネントの動作確認", async () => {
   await resetList();
 
   // 各テストの共通の初期化（クリーン処理は「vitest.setup.ts」に記載済み）
-  let debug: () => void; // デバック用
+  //let debug: () => void; // デバック用
   beforeEach(async () => {
-    const renderResult = render(<App />);
-    debug = renderResult.debug;
+    render(<App />);
+    //const renderResult = render(<App />);
+    //debug = renderResult.debug;
   });
 
   describe("初期表示と初期値の確認", () => {
@@ -292,7 +293,7 @@ describe("Appコンポーネントの動作確認", async () => {
       );
 
       // 登録2回目（2個目登録できるか確認）
-      const reAfterNum = await checkAddList(
+      await checkAddList(
         inputElText,
         inputElNumber,
         buttonSignup,
