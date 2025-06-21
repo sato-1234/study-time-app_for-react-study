@@ -10,7 +10,7 @@
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": true, //falseでクラスのpublic使用許可
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",

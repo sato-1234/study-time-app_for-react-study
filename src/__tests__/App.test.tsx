@@ -7,33 +7,72 @@ import {
   waitForElementToBeRemoved,
 } from "@testing-library/react";
 //import userEvent from "@testing-library/user-event";
-import { user } from "../vitest.setup";
-import { getStudy, deleteStudy } from "./modules/study/study.repository";
-import App from "./App";
+import { user } from "../../vitest.setup";
+import { Study } from "../domain/study";
+import { vi } from "vitest";
+import { randomUUID } from "crypto";
+import App from "../App";
 
 // ------------------------------
-// テストで使用する値
-const inputStudyValue1: string = "test1"; //学習内容を入力
-const inputStudyTime1: string = "1"; //学習時間を入力（型は文字列だが数値で入力）
-const inputStudyValue2: string = "test2"; //学習内容を入力
-const inputStudyTime2: string = "2"; //学習時間を入力（型は文字列だが数値で入力）
-const addValue1 = `${inputStudyValue1}：${inputStudyTime1}`;
-const addValue2 = `${inputStudyValue2}：${inputStudyTime2}`;
-const waitTimeout: number = 1000;
+// テストで追加と削除で使用する値
+const inputStudyValue1: string = "追加された学習104"; //学習内容を入力
+const inputStudyTime1: string = "4"; //学習時間を入力（型は文字列だが数値で入力）
+const inputStudyValue2: string = "追加された学習105"; //学習内容を入力
+const inputStudyTime2: string = "5"; //学習時間を入力（型は文字列だが数値で入力）
+const waitTimeout: number = 1000; //追加と削除時にまつ最大秒数
 
-// ------------------------------
-// Supabaseのリストを初期化する共通関数（初期化用）
-const resetList = async () => {
-  const data = await getStudy();
-  if (data.length >= 1) {
-    // 1件ずつ await で削除
-    for (const record of data) {
-      // await Promise.all(data.map( async (record) => deleteStudy(record.id)));
-      // Promise.allは並列実行なので順序が保証されないが高速（1つ失敗したらreject）
-      await deleteStudy(record.id);
-    }
+// mock
+const mockStudyStore = new Map<string, Study>();
+const mockGetStudy = vi.fn().mockImplementation(() => {
+  // ランダムID生成（テスト用）
+  const datas = [
+    new Study(randomUUID(), "test102", 2),
+    new Study(randomUUID(), "test103", 3),
+  ];
+  for (const record of datas) {
+    const newStudy = new Study(record.id, record.title, record.time);
+    mockStudyStore.set(record.id, newStudy); // 削除時にid以外も取得するため使用
   }
-};
+  return Promise.resolve(datas);
+});
+
+const mockCreateStudy = vi
+  .fn()
+  .mockImplementation((title: string, time: number) => {
+    // ランダムID生成（テスト用）
+    const id = randomUUID(); // 36文字のUUID生成
+    const newStudy = new Study(id, title, time);
+    mockStudyStore.set(id, newStudy); // 削除時にid以外も取得するため使用
+    return Promise.resolve(newStudy);
+  });
+const mockDeleteStudy = vi.fn().mockImplementation((id: string) => {
+  const deleted = mockStudyStore.get(id);
+  mockStudyStore.delete(id);
+  return Promise.resolve(deleted ? deleted : null);
+});
+
+// モック対象の study.repository.ts をモック
+vi.mock("../modules/study/study.repository", () => {
+  return {
+    getStudy: () => mockGetStudy(),
+    createStudy: (title: string, time: number) => mockCreateStudy(title, time),
+    deleteStudy: (id: string) => mockDeleteStudy(id),
+  };
+});
+
+// ------------------------------
+// Supabaseのテーブルを初期化する共通関数（初期化用）:モックにするためコメント
+// const resetList = async () => {
+//   const data = await getStudy();
+//   if (data.length >= 1) {
+//     // 1件ずつ await で削除
+//     for (const record of data) {
+//       // await Promise.all(data.map( async (record) => deleteStudy(record.id)));
+//       // Promise.allは並列実行なので順序が保証されないが高速（1つ失敗したらreject）
+//       await deleteStudy(record.id);
+//     }
+//   }
+// };
 
 // リストを取得する共通関数
 type TypeGetList = {
@@ -58,17 +97,14 @@ const getList = (): TypeGetList => {
 type TypeGetLastList = {
   lastItem: HTMLElement | null;
   lastId: string | null;
-  target: HTMLElement | null;
 };
-const getLastList = (lis: HTMLElement[], addValue: string): TypeGetLastList => {
+const getLastList = (lis: HTMLElement[]): TypeGetLastList => {
   if (lis.length >= 1) {
     const lastItem = lis[lis.length - 1];
     const lastId = lastItem.getAttribute("data-id");
-    // ユーザー目線で念のため.querySelector("span");ではなく.findByTextを使用
-    const target = within(lastItem).getByText(addValue);
-    return { lastItem, lastId, target };
+    return { lastItem, lastId };
   }
-  return { lastItem: null, lastId: null, target: null };
+  return { lastItem: null, lastId: null };
 };
 
 // リストが追加または削除を待つ共通関数
@@ -138,13 +174,14 @@ const addList = async ({
   await user.click(buttonSignup);
 };
 
-describe("Appコンポーネントの動作確認", async () => {
-  // DB初期化（テスト実行時の1回(最初)のみ。各テストごとではない）
-  await resetList();
+describe("Appコンポーネントの動作確認", () => {
+  // DB初期化
+  // await resetList();
 
   // 各テストの共通の初期化（クリーン処理は「vitest.setup.ts」に記載済み）
   //let debug: () => void; // デバック用
   beforeEach(async () => {
+    mockStudyStore.clear(); // 各テスト前にリセット
     render(<App />);
     //const renderResult = render(<App />);
     //debug = renderResult.debug;
@@ -169,20 +206,18 @@ describe("Appコンポーネントの動作確認", async () => {
       // .toHaveValue()で完全一致を確認
       expect(inputElText).toHaveValue(""); //空か確認
       expect(inputElNumber).toHaveValue(0); //0か確認
+      //debug(inputElText);
     });
   });
 
   describe("リストの登録・削除・エラーチェック", () => {
     // テストデータ登録 → 待つ → 再リスト取得 → 値チェック → 現在リスト数表示
     const checkAddList = async (
-      inputElText: HTMLElement,
-      inputElNumber: HTMLElement,
-      buttonSignup: HTMLElement,
       inputStudyValue: string,
       inputStudyTime: string,
-      previousLength: number,
-      addValue: string
+      previousLength: number
     ) => {
+      const { inputElText, inputElNumber, buttonSignup } = getFormChildren();
       // テストデータを登録する
       await addList({
         inputElText,
@@ -196,24 +231,39 @@ describe("Appコンポーネントの動作確認", async () => {
 
       // 再リスト取得(登録後はliが1個以上==NULLではない)
       const { lis, num } = getList();
-      const { target } = getLastList(lis, addValue);
+      const { lastItem, lastId } = getLastList(lis);
 
-      // 入力した値で表示されていること(登録1個目)
-      expect(target).toBeVisible();
-      expect(target).toHaveTextContent(new RegExp(`^${addValue}$`));
-      expect(inputElText).toHaveValue(""); //初期値にもどっていること
-      expect(inputElNumber).toHaveValue(0); //初期値にもどっていること
-      console.log("after（登録）：" + num + "個");
+      if (lastItem) {
+        // ユーザー目線で念のため.querySelector("span");ではなく.findByTextを使用
+        // テキストが表示されるまで待機
+        const target = await within(lastItem).findByText(
+          `${inputStudyValue}：${inputStudyTime}`
+        );
 
-      return num;
+        // 入力した値で表示されていること(登録1個目)
+        expect(target).toBeVisible();
+        expect(target).toHaveTextContent(
+          new RegExp(`^${inputStudyValue}：${inputStudyTime}$`)
+        );
+        expect(inputElText).toHaveValue(""); //初期値にもどっていること
+        expect(inputElNumber).toHaveValue(0); //初期値にもどっていること
+        console.log(`after（登録後）:現リスト${num}個`);
+        console.log(
+          `登録内容 \n id：${lastId} \n title：${inputStudyValue} \n time：${inputStudyTime}`
+        );
+        return num;
+      } else {
+        throw new Error("登録後はリストは存在するはずですが、リストが0個です");
+      }
     };
 
-    // テストデータ削除 → 待つ → 再リスト取得 → 値チェック → 現在リスト数表示
-    const checkMinusList = async (addValue: string) => {
+    // テストデータ削除（末のli削除） → 待つ → 再リスト取得 → 値チェック → 現在リスト数表示
+    const checkMinusList = async () => {
       // リスト取得
       const { lis: beforelis, num: beforeNum } = getList();
-      const { lastItem, lastId } = getLastList(beforelis, addValue);
-      console.log(lastId); //削除するリストのID
+      const { lastItem, lastId } = getLastList(beforelis);
+      console.log(`before（削除前）:現リスト${beforeNum}個`);
+      console.log(`削除予定ID：${lastId}`); //削除するリストのID
 
       // 登録後なので必ず1件以上あるが、0件の場合も考慮
       if (lastItem != null) {
@@ -234,21 +284,21 @@ describe("Appコンポーネントの動作確認", async () => {
         expect(ids).not.toContain(lastId);
       }
       // リスト数(after)
-      console.log("after（削除後）" + afterNum + "個");
+      console.log(`after（削除後）:現リスト${afterNum}個`);
+      console.log(`削除ID：${lastId}`);
     };
 
     // リスト取得（before） → 登録クリック → エラーメッセージ → リスト取得(after) → 現在リスト数表示
     const errorMessageCheck = async (
-      inputElText: HTMLElement,
-      buttonSignup: HTMLElement,
       type: string = "blank",
       message: string
     ) => {
-      // 再リスト取得（before）
+      const { inputElText, buttonSignup } = getFormChildren();
+      // リスト取得（before）
       const { lis: beforelis, num: beforeNum } = getList();
-      console.log("before(エラーメッセージ表示前)：" + beforeNum + "個");
-      const { lastId: lastIdBefore } = getLastList(beforelis, addValue2);
-      console.log(lastIdBefore); //比較するBeforeID
+      console.log(`before(エラーメッセージ表示前):現リスト${beforeNum}個`);
+      const { lastId: lastIdBefore } = getLastList(beforelis);
+      console.log(`比較するBeforeID：${lastIdBefore}`);
 
       if (type === "notBlank") {
         await user.type(inputElText, "任意値入力");
@@ -263,9 +313,9 @@ describe("Appコンポーネントの動作確認", async () => {
 
       // 再リスト取得（after）
       const { lis: afterlis, num: afterNum } = getList();
-      console.log("after(エラーメッセージ表示後)：" + afterNum + "個");
-      const { lastId: lastIdAfter } = getLastList(afterlis, addValue2);
-      console.log(lastIdAfter); //比較するBeforeID
+      console.log(`after(エラーメッセージ表示後):現リスト${afterNum}個`);
+      const { lastId: lastIdAfter } = getLastList(afterlis);
+      console.log(`比較するAfterID：${lastIdAfter}`);
 
       // IDが変わっていないことを確認
       expect(lastIdAfter).toBe(lastIdBefore);
@@ -275,77 +325,39 @@ describe("Appコンポーネントの動作確認", async () => {
       await waitForElementToBeRemoved(() => screen.getByText("Loading..."));
     });
 
-    test("フォームに学習内容と時間を入力して登録ボタンを押すと新たに記録が追加されていること", async () => {
-      const { inputElText, inputElNumber, buttonSignup } = getFormChildren();
+    test("フォームに内容と時間を入力して登録すると、リストに項目が追加される", async () => {
       // 初回リスト取得
       const { num } = getList();
-      console.log("before（登録）：" + num + "個");
+
+      console.log(`before（登録前）:現リスト${num}個`);
 
       // 登録1回目
       const afterNum = await checkAddList(
-        inputElText,
-        inputElNumber,
-        buttonSignup,
         inputStudyValue1,
         inputStudyTime1,
-        num,
-        addValue1
+        num
       );
+      expect(mockCreateStudy).toHaveBeenCalledTimes(1);
 
       // 登録2回目（2個目登録できるか確認）
-      await checkAddList(
-        inputElText,
-        inputElNumber,
-        buttonSignup,
-        inputStudyValue2,
-        inputStudyTime2,
-        afterNum,
-        addValue2
-      );
+      await checkAddList(inputStudyValue2, inputStudyTime2, afterNum);
+      expect(mockCreateStudy).toHaveBeenCalledTimes(2);
     });
 
     // 登録の処理でリストが2個になったので、その状態からスタート
     test("削除ボタンを押すと学習記録が削除される", async () => {
       // 1回目削除（2個→1個）
-      await checkMinusList(addValue2);
+      await checkMinusList();
       // 2回目削除（1個→0個）
-      await checkMinusList(addValue1);
+      await checkMinusList();
     });
 
     test("入力をしないで登録を押すとエラーが表示される", async () => {
-      const { inputElText, inputElNumber, buttonSignup } = getFormChildren();
-      // リストの前後変化も確認したいので、テストデータを2件登録する
-      const addData = [
-        { inputStudyValue: inputStudyValue1, inputStudyTime: inputStudyTime1 },
-        { inputStudyValue: inputStudyValue2, inputStudyTime: inputStudyTime2 },
-      ];
-      // await Promise.all(addData.map(async (data) => {}はリストが並列競合するため使用しない
-      for (const data of addData) {
-        const { num } = getList();
-        await addList({
-          inputElText,
-          inputElNumber,
-          buttonSignup,
-          inputStudyValue: data.inputStudyValue,
-          inputStudyTime: data.inputStudyTime,
-        });
-        await waitForListLengthChange(num);
-      }
-
-      await errorMessageCheck(
-        inputElText,
-        buttonSignup,
-        "blank",
-        "学習内容は必須項目になります"
-      );
+      await errorMessageCheck("blank", "学習内容は必須項目になります");
     });
 
     test("学習時間を0以下にして登録押すとエラーが表示される", async () => {
-      const { inputElText, buttonSignup } = getFormChildren();
-      //上記2件登録済みなので、今回は事前登録処理はなし
       await errorMessageCheck(
-        inputElText,
-        buttonSignup,
         "notBlank",
         "学習時間は1以上の値で入力してください"
       );

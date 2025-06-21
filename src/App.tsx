@@ -1,17 +1,17 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { taskOne } from "./task";
 import {
+  getStudy,
   createStudy,
   deleteStudy,
-  getStudy,
 } from "./modules/study/study.repository";
+import { Study } from "./domain/study";
 
-type RecordType = {
-  id: string;
-  title: string;
-  time: number;
-};
-
+// type RecordType = {
+//   id: string;
+//   title: string;
+//   time: number;
+// };
 // const records: RecordType[] = [
 //   { id: "1", title: "勉強の記録1", time: 1 },
 //   { id: "2", title: "勉強の記録2", time: 3 },
@@ -26,7 +26,7 @@ const testStyle = {
 function App() {
   console.log("App");
 
-  const [list, setList] = useState<RecordType[]>([]);
+  const [list, setList] = useState<Study[]>([]);
   const [title, setTitle] = useState("");
   const [studyTime, setStudyTime] = useState(0);
   const [total, setTotal] = useState(0);
@@ -39,9 +39,9 @@ function App() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const datas = await getStudy();
-        if (datas != null) {
-          setList(datas);
+        const res = await getStudy();
+        if (res != null) {
+          setList(res); // 配列
         }
       } catch (err) {
         console.error(err);
@@ -72,13 +72,10 @@ function App() {
 
     const createData = async () => {
       try {
-        const data = await createStudy(title, studyTime);
-        const newList = [
-          ...list,
-          { id: data.id, title: data.title, time: data.time },
-        ];
+        const res = await createStudy(title, studyTime);
+        const newList = [...list, res];
         setList(newList);
-        setTotal(total + data.time);
+        setTotal(total + res.time);
         setTitle("");
         setStudyTime(0);
         setError("");
@@ -93,10 +90,10 @@ function App() {
 
   const deleteList = async (id: string) => {
     try {
-      const data = await deleteStudy(id);
-      const newList = list.filter((v) => v.id !== data.id); //一致しないIDすべて
+      const res = await deleteStudy(id);
+      const newList = list.filter((v) => v.id !== res.id); //一致しないIDすべて
       setList(newList);
-      setTotal(total + data.time);
+      setTotal(total + res.time);
     } catch (err) {
       console.error(err);
     } finally {
@@ -116,12 +113,10 @@ function App() {
           <div>Loading...</div>
         ) : list.length >= 1 ? (
           <ul data-testid="study-list">
-            {list.map((v) => (
-              <li key={v.id} data-id={v.id}>
-                <span>
-                  {v.title}：{v.time}
-                </span>
-                <button onClick={() => deleteList(v.id)}>削除</button>
+            {list.map((study) => (
+              <li key={study.id} data-id={study.id}>
+                <span>{`${study.title}：${study.time}`}</span>
+                <button onClick={() => deleteList(study.id)}>削除</button>
               </li>
             ))}
           </ul>

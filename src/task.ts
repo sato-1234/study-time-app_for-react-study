@@ -76,7 +76,7 @@ export const taskTwo: TasksType[] = [
   },
   {
     check: true,
-    content: "「タイトル「学習記録一覧」が表示されていること」「フォームに学習内容と時間を入力して登録ボタンを押すと新たに記録が追加されていること」「削除ボタンを押すと学習記録が削除される」「入力をしないで登録を押すとエラーが表示される」の自動テストを作成する",
+    content: "「タイトル「学習記録一覧」が表示されていること」「フォームに内容と時間を入力して登録すると、リストに項目が追加される」「削除ボタンを押すと学習記録が削除される」「入力をしないで登録を押すとエラーが表示される」の自動テストを作成する",
   },
   {
     check: true,
@@ -87,4 +87,19 @@ export const taskTwo: TasksType[] = [
     content: "React+TypeScriptの開発環境をViteで用意し、Fireabseにデプロイし、vitestとreact-testing-libraryを導入しテストファイル作成、Github Actions(Push)でCI/CDする",
   }
 ];
+
+export const taskThree: TasksType[] = [
+  {
+    check: false,
+    content: "ChakuraUIを導入する",
+  },
+  {
+    check: false,
+    content: "Supabaseの初期設定をする（認証機能を使用するための設定。外部キー等）",
+  },
+  {
+    check: false,
+    content: "ログイン機能を実装し、ユーザーはログイン後のタイトル（マイページ）をみることができる",
+  },
+]
 
