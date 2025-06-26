@@ -16,9 +16,18 @@ npm create vite@latest
 npm run dev
 ```
 
-## 2025/06/15 以降：課題２ 実装中
+## 2025/06/15 以降：課題２ 完了
 
-Supabase 上で作成したテーブル「study_record」にテストデータを INSERT
+Supabase 上でテーブル名「study_record」作成
+(ポリシーは一旦全ユーザー許可：RLS を無効)
+
+| column_name | data_type     | other        |
+| ----------- | ------------- | ------------ |
+| id          | UUID          | Primary Key, |
+| title       | text          |              |
+| time        | integer(4 桁) |              |
+
+「study_record」にテストデータを INSERT
 
 ```
 INSERT INTO study_record (id, title, time) VALUES
@@ -32,7 +41,6 @@ Supabase からテーブル型を取得して database.types.ts を作成
 ```
 npm i @supabase/supabase-js
 npx supabase login
-npx supabase init
 npx supabase gen types --lang=typescript --project-id "project-idを入力" --schema public > database.types.ts
 ```
 
@@ -61,6 +69,42 @@ firebase init hosting:github
 ```
 npm i -D vitest @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event jsdom
 npm i -D @vitest/ui //任意
+```
+
+## 2025/06/20 以降：課題 3 実装中
+
+実装に必要なパッケージインストール
+
+```
+npm i react-router-dom
+npm i styled-components
+npm i react-hook-form
+npm i lucide-react
+```
+
+Supabase 上のテーブル名「study_record」にテストデータを Delete
+（テストデータかつ削除してよい場合。削除許可がない場合は気軽に以下の SQL を使用しないように）
+
+```
+DELETE FROM study_record;
+```
+
+「study_record」に外部キーや RLS を有効にしてポリシーの設定をする
+(すべて「not null」。Foreign key は「user_id → auth.users.id」)
+
+| column_name | data_type                | other                   |
+| ----------- | ------------------------ | ----------------------- |
+| id          | UUID                     | Primary Key             |
+| user_id     | UUID                     | Primary Key,Foreign key |
+| title       | text                     |                         |
+| time        | integer(4 桁)            |                         |
+| create_id   | timestamp with time zone | Asia/Tokyo              |
+
+テーブル型を再取得して database.types.ts を作成
+
+```
+npx supabase login
+npx supabase gen types --lang=typescript --project-id "project-idを入力" --schema public > database.types.ts
 ```
 
 ## 使用技術

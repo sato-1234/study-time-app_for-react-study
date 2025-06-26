@@ -1,0 +1,99 @@
+/*	------------------------------------------------
+全体共通
+------------------------------------------------	*/
+:root {
+  --text-color: #333;
+  --text-color2: #666;
+  --border-color: #333;
+  --border-color2: #ccc;
+  /* --text-color1: #c8b464;
+	--text-color2: #f1f1f1;
+	--text-color3: #444;
+	--border-color2: hsla(0,0%,78%,.5);
+	--border-color3: #dcdcdc;
+	--boxShadow: 0px 1px 0px #f1f1f1;
+	--boxShadow2: 0px 0px 10px #f1f1f1;
+	--bG-color0: #f9f9f9;
+	--bG-color: #292d3d;
+	--bG-color2: #1e73be;
+	--content1: "📁";
+	--content2: "⟳";
+	--content3: "📖";
+	--content4: "・";
+	--hover: #f1e2e2; */
+}
+
+/*  文字デザインとサイズ  */
+body {
+  margin: 0;
+  font-synthesis: none;
+  font-family: YuGothic, "Yu Gothic", "游ゴシック体", "游ゴシック",
+    "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  color: var(--text-color0);
+}
+#root {
+  position: relative;
+  height: 100vh;
+}
+h1,
+h2,
+h3,
+p,
+ul {
+  margin: 0;
+}
+button {
+  cursor: pointer;
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
+table {
+  display: block;
+  border-collapse: collapse;
+}
+thead,
+tbody,
+tfoot,
+tr,
+label {
+  width: 100%;
+  display: block;
+}
+th,
+td {
+  word-wrap: break-word; /* 古いブラウザ用 */
+  word-break: break-word; /* 推奨：長い単語を折り返す */
+  overflow-wrap: break-word; /* 新しい標準 */
+}
+th[scope="col"],
+th[scope="row"] {
+  font-weight: normal;
+}
+
+/* HTML: <div class="loader"></div>
+   https://css-loaders.com/spinner/
+*/
+.loader {
+  width: 150px;
+  padding: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #25b09b;
+  --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
+  -webkit-mask: var(--_m);
+  mask: var(--_m);
+  -webkit-mask-composite: source-out;
+  mask-composite: subtract;
+  animation: l3 1s infinite linear;
+}
+@keyframes l3 {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/*	------------------------------------------------
+footer共通
+------------------------------------------------	*/

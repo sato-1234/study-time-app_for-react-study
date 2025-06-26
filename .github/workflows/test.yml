@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    if: false # FireBaseを公開したらこの行を削除する
     runs-on: ubuntu-latest
 
     steps:

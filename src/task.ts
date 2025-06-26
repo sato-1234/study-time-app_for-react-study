@@ -76,7 +76,8 @@ export const taskTwo: TasksType[] = [
   },
   {
     check: true,
-    content: "「タイトル「学習記録一覧」が表示されていること」「フォームに内容と時間を入力して登録すると、リストに項目が追加される」「削除ボタンを押すと学習記録が削除される」「入力をしないで登録を押すとエラーが表示される」の自動テストを作成する",
+    content:
+      "「タイトル「学習記録一覧」が表示されていること」「フォームに内容と時間を入力して登録すると、リストに項目が追加される」「削除ボタンを押すと学習記録が削除される」「入力をしないで登録を押すとエラーが表示される」の自動テストを作成する",
   },
   {
     check: true,
@@ -84,8 +85,9 @@ export const taskTwo: TasksType[] = [
   },
   {
     check: true,
-    content: "React+TypeScriptの開発環境をViteで用意し、Fireabseにデプロイし、vitestとreact-testing-libraryを導入しテストファイル作成、Github Actions(Push)でCI/CDする",
-  }
+    content:
+      "React+TypeScriptの開発環境をViteで用意し、Fireabseにデプロイし、vitestとreact-testing-libraryを導入しテストファイル作成、Github Actions(Push)でCI/CDする。※.envファイルはGITHUBにpushせずに、Secrets機能を使用すること",
+  },
 ];
 
 export const taskThree: TasksType[] = [
@@ -94,12 +96,41 @@ export const taskThree: TasksType[] = [
     content: "ChakuraUIを導入する",
   },
   {
-    check: false,
-    content: "Supabaseの初期設定をする（認証機能を使用するための設定。外部キー等）",
+    check: true,
+    content:
+      "Supabaseの初期設定をする（認証機能を使用するための設定と、userテーブルとstudy_recordテーブルを外部キー（id）で紐づける）",
   },
   {
-    check: false,
-    content: "ログイン機能を実装し、ユーザーはログイン後のタイトル（マイページ）をみることができる",
+    check: true,
+    content:
+      "ユーザー登録処理→ログイン機能→ログアウト機能を実装し、ユーザーはログイン後のマイページをみることができる。useContect(ステート)でログイン情報",
   },
-]
-
+  {
+    check: true,
+    content:
+      "学習記録はクラスを利用して実装し、ログイン後に登録、削除処理が可能なこと",
+  },
+  {
+    check: true,
+    content:
+      "学習記録データ取得のときにローディング画面（Loading...が表示されていること）をみることができる",
+  },
+  {
+    check: true,
+    content: "react-hook-formを導入し、Form関連に使用すること",
+  },
+  {
+    check: true,
+    content:
+      "各バリエーションエラーメッセージ「内容の入力は必須です」「時間の入力は必須です」「時間は1以上である必要があります」を表示すること",
+  },
+  {
+    check: true,
+    content: "モーダルをコンポーネント化すること",
+  },
+  {
+    check: true,
+    content:
+      "自動テストを実装する「ローディング画面をみることができる」「」「」「」",
+  },
+];

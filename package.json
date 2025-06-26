@@ -13,8 +13,12 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
     "firebase": "^11.9.1",
+    "lucide-react": "^0.523.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.58.1",
+    "react-router-dom": "^7.6.2",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

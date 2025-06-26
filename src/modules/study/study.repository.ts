@@ -1,11 +1,11 @@
 import { supabase } from "../../lib/supabase";
 import { Study } from "../../domain/study"
 
-/* Supabase上のロールの設定（ログイン機能がまだのため一旦全ユーザー）
-  alter policy "Enable access for all users"
-  on "public"."study_record"
-  to anon
-  using (true);
+/* Supabase上のロールの設定
+  SELECT : ログイン後、自分で作成したレコードのみ閲覧可能
+  INSERT : ログイン後、レコードの作成が可能
+  UPDATE : ログイン後、自分で作成したレコードのみ更新可能
+  DELETE : ログイン後、自分で作成したレコードのみ削除可能
 */
 
 // 型をStudy型で返す。非同期のため返値Promise<Study[]>
@@ -16,6 +16,7 @@ export async function getStudy(): Promise<Study[]> {
   const res = data.map((study) => {
     return new Study(study.id, study.title, study.time);
   })
+  
   return res;
 }
 
