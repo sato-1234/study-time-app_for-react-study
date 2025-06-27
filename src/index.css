@@ -6,24 +6,9 @@
   --text-color2: #666;
   --border-color: #333;
   --border-color2: #ccc;
-  /* --text-color1: #c8b464;
-	--text-color2: #f1f1f1;
-	--text-color3: #444;
-	--border-color2: hsla(0,0%,78%,.5);
-	--border-color3: #dcdcdc;
-	--boxShadow: 0px 1px 0px #f1f1f1;
-	--boxShadow2: 0px 0px 10px #f1f1f1;
-	--bG-color0: #f9f9f9;
-	--bG-color: #292d3d;
-	--bG-color2: #1e73be;
-	--content1: "📁";
-	--content2: "⟳";
-	--content3: "📖";
-	--content4: "・";
-	--hover: #f1e2e2; */
 }
 
-/*  文字デザインとサイズ  */
+/*  デザイン、文字、サイズ  */
 body {
   margin: 0;
   font-synthesis: none;

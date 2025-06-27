@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import { useAuth } from "../../providers/AuthProvider";
+import { memo } from "react";
 
 const AppHeader = styled.header`
   display: flex;
@@ -45,7 +46,7 @@ const AppHeader = styled.header`
   }
 `;
 
-const Heder = () => {
+const Heder = memo(() => {
   console.log("Heder");
 
   const { user } = useAuth();
@@ -68,6 +69,6 @@ const Heder = () => {
       </nav>
     </AppHeader>
   );
-};
+});
 
 export default Heder;

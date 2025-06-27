@@ -1,5 +1,5 @@
 // pages/SignoutPage.tsx
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { signout } from "../modules/auth/user.repository";
 import styled from "styled-components";
@@ -12,7 +12,9 @@ const SignupDiv = styled.div`
   height: 100vh; // 画面全体の高さに広げる
 `;
 
-const Signout = () => {
+const Signout = memo(() => {
+  console.log("Signout");
+
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -34,6 +36,6 @@ const Signout = () => {
   */
 
   return <SignupDiv>ログアウト中です...</SignupDiv>;
-};
+});
 
 export default Signout;

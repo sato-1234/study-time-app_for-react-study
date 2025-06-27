@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
@@ -53,7 +53,7 @@ type FormData = {
   password: string;
 };
 
-function Signup() {
+const Signup = memo(() => {
   console.log("Signup");
 
   // const [nickname, setNickname] = useState("");
@@ -179,6 +179,6 @@ function Signup() {
       </p>
     </SignupMain>
   );
-}
+});
 
 export default Signup;

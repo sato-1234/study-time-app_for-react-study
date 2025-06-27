@@ -1,10 +1,10 @@
-//import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
 import { signin } from "../modules/auth/user.repository";
 import { useAuth } from "../providers/AuthProvider";
+import { memo } from "react";
 
 const SigninMain = styled.main`
   width: 300px;
@@ -48,7 +48,7 @@ type FormData = {
   password: string;
 };
 
-function Signin() {
+const Signin = memo(() => {
   console.log("Signin");
 
   const { register, handleSubmit, formState } = useForm<FormData>();
@@ -149,6 +149,6 @@ function Signin() {
       </p>
     </SigninMain>
   );
-}
+});
 
 export default Signin;

@@ -16,7 +16,7 @@ npm create vite@latest
 npm run dev
 ```
 
-## 2025/06/15 以降：課題２ 完了
+## 2025/06/20 ：課題２ 完了
 
 Supabase 上でテーブル名「study_record」作成
 (ポリシーは一旦全ユーザー許可：RLS を無効)
@@ -71,7 +71,7 @@ npm i -D vitest @testing-library/react @testing-library/dom @testing-library/jes
 npm i -D @vitest/ui //任意
 ```
 
-## 2025/06/20 以降：課題 3 実装中
+## 2025/06/27 ：課題 3 完了
 
 実装に必要なパッケージインストール
 

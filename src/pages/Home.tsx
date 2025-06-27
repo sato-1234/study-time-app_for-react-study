@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  // useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Navigate } from "react-router-dom";
 import styled from "styled-components";
 import { Pencil, Trash2 } from "lucide-react";
@@ -7,6 +14,7 @@ import {
   getStudy,
   createStudy,
   deleteStudy,
+  editStudy,
 } from "../modules/study/study.repository";
 import { Study } from "../domain/study";
 import { useAuth } from "../providers/AuthProvider";
@@ -123,14 +131,39 @@ type FormData = {
   time: number;
 };
 
-function Home() {
+/* レンダリングの詳細↓↓
+  ログイン中状態で「http://localhost:5173/」アクセスし、Supabaseから取得するリストは1個以上
+
+  App.tsx　→　初回レンダリング
+  Heder.tsx:50 Heder　→　初回レンダリング
+  Home.tsx:134 Home　→　初回レンダリング
+  Heder.tsx:50 Heder　→　ログイン中のため「useAuth」がnull→あるに変更しため。レンダリング2回目
+  Home.tsx:134 Home　→　ログイン中のため「useAuth」がnull→あるに変更しため。レンダリング2回目
+  Signin.tsx:52 Signin　→　「useAuth」がnull→あるに変更した場合、/signinのルートも一時的に評価されることがある。レンダリング1回目
+  Signin.tsx:52 Signin　→　<Navigate replace to="/" />;があるため。レンダリング2回目
+  Home.tsx:134 Home　→　console.logの出力順は必ずしもDOMツリーの順序通りとは限らないため。レンダリング3回目（初回レンダリングのような状態）
+  Heder.tsx:50 Heder　→　console.logの出力順は必ずしもDOMツリーの順序通りとは限らないため。レンダリング3回目（初回レンダリングのような状態）
+  Home.tsx:134 Home　→　useXXXで再レンダリングされた。レンダリング4回目
+  Heder.tsx:50 Heder　→　navのリンクメニュー部分が変更されため。レンダリング4回目
+  Home.tsx:134 Home　→　リスト取得でsetLoading(trus)、setList、setLoading(false);が実行されため。レンダリング5回目
+  Home.tsx:134 Home　→　リストが変化し、useMemo()実行しためレンダリング6回目
+
+*/
+const Home = memo(() => {
   console.log("Home");
 
   const [list, setList] = useState<Study[]>([]);
-  const [total, setTotal] = useState(0);
+  //const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const [toastOpen, setToastOpen] = useState(false);
+  const [modalType, setModalType] = useState<"add" | "edit">("add");
+  const [editTarget, setEditTarget] = useState<Study | null>(null);
+
+  //　useLayoutEffectの変わりに「useMemo」を使用
+  const total = useMemo(() => {
+    return list.reduce((acc, cur) => acc + cur.time, 0);
+  }, [list]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -149,24 +182,30 @@ function Home() {
     fetchData();
   }, []);
 
-  useLayoutEffect(() => {
-    if (list.length >= 1) {
-      const totalTime = list.reduce((acc, cur) => acc + cur.time, 0);
-      setTotal(totalTime);
-    }
-  }, [list]);
+  // useLayoutEffect(() => {
+  //   if (list.length >= 1) {
+  //     const totalTime = list.reduce((acc, cur) => acc + cur.time, 0);
+  //     setTotal(totalTime);
+  //   }
+  // }, [list]);
 
   const handleClose = useCallback(() => setToastOpen(false), []);
 
   const handleSubmitForm = useCallback(
     async (data: FormData) => {
-      const res = await createStudy(data.title, data.time);
-      const newList = [...list, res];
-      setList(newList);
-      setTotal((prev) => prev + res.time);
+      const res =
+        modalType === "add"
+          ? await createStudy(data.title, data.time)
+          : await editStudy(editTarget!.id, data.title, data.time);
+
+      setList(
+        modalType === "add"
+          ? [...list, res]
+          : list.map((item) => (item.id === res.id ? res : item))
+      );
       setToastOpen(false);
     },
-    [list]
+    [list, modalType, editTarget]
   );
 
   // ログインしていない場合、ログインページにリダイレクト
@@ -188,7 +227,6 @@ function Home() {
   //       const res = await createStudy(title, studyTime);
   //       const newList = [...list, res];
   //       setList(newList);
-  //       setTotal(total + res.time);
   //       setTitle("");
   //       setStudyTime(0);
   //       setError("");
@@ -207,9 +245,8 @@ function Home() {
     if (result) {
       try {
         const res = await deleteStudy(id);
-        const newList = list.filter((v) => v.id !== res.id); //一致しないIDすべて
-        setList(newList);
-        setTotal(total + res.time);
+        //一致しないIDすべて
+        setList(list.filter((v) => v.id !== res.id));
       } catch (err) {
         console.error(err);
         alert("削除に失敗しました。");
@@ -219,23 +256,42 @@ function Home() {
     }
   };
 
+  const openAddModal = () => {
+    setModalType("add");
+    setEditTarget(null);
+    setToastOpen(true);
+  };
+
+  const openEditModal = (study: Study) => {
+    setModalType("edit");
+    setEditTarget(study);
+    setToastOpen(true);
+  };
+
   return (
     <>
       <HomeMain>
         <h2>学習記録一覧</h2>
         {toastOpen && (
-          <Modal onClose={handleClose} onSubmitForm={handleSubmitForm} />
+          <Modal
+            type={modalType}
+            editTarget={editTarget}
+            onClose={handleClose}
+            onSubmitForm={handleSubmitForm}
+          />
         )}
-        <div className="button">
-          <button onClick={() => setToastOpen(true)}>新規登録</button>
+        <div className="button" data-testid="new-add-button">
+          <button onClick={openAddModal}>新規登録</button>
         </div>
         {loading ? (
           <div className="loaderDiv">
-            <div className="loaderText">Loading...</div>
+            <div className="loaderText" data-testid="loader-text">
+              Loading...
+            </div>
             <div className="loader"></div>
           </div>
         ) : list.length >= 1 ? (
-          <table data-testid="study-list">
+          <table>
             <thead>
               <tr>
                 <th scope="col">学習内容</th>
@@ -243,17 +299,22 @@ function Home() {
                 <th colSpan={2}></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody data-testid="study-list">
               {list.map((study) => (
                 <tr key={study.id} data-id={study.id}>
                   <td>{study.title}</td>
                   <td>{study.time}h</td>
                   <td>
-                    <Pencil className="pencil" />
+                    <Pencil
+                      className="pencil"
+                      data-testid="edit-list"
+                      onClick={() => openEditModal(study)}
+                    />
                   </td>
                   <td>
                     <Trash2
                       className="trash"
+                      data-testid="delete-list"
                       onClick={() => deleteList(study.id)}
                     />
                   </td>
@@ -268,11 +329,13 @@ function Home() {
             </tfoot>
           </table>
         ) : (
-          <div className="noList">まだ学習記録を登録していません。</div>
+          <div className="noList" data-testid="no-list">
+            まだ学習記録を登録していません。
+          </div>
         )}
       </HomeMain>
     </>
   );
-}
+});
 
 export default Home;

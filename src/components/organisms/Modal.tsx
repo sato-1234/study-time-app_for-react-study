@@ -2,6 +2,8 @@ import { memo } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
+import { Study } from "../../domain/study";
+
 const ToastDiv = styled.div`
   position: absolute;
   z-index: 100;
@@ -78,13 +80,26 @@ type FormData = {
 };
 
 type Props = {
+  type: string;
+  editTarget: Study | null;
   onClose: () => void;
   onSubmitForm: (data: FormData) => void;
 };
 
-const Modal = memo(({ onClose, onSubmitForm }: Props) => {
+/* 新規登録ボタン押下後のレンダリング詳細
+  Home　→　新規登録でuse値が変化。親レンダリング
+  Modal.tsx:86 Modal　→　読み出しで初回子レンダリング
+  Modal.tsx:86 Modal　→　親が再レンダリングされると子も再レンダリングされる
+*/
+const Modal = memo(({ type, editTarget, onClose, onSubmitForm }: Props) => {
   console.log("Modal");
-  const { register, handleSubmit, formState, reset } = useForm<FormData>();
+
+  const { register, handleSubmit, formState, reset } = useForm<FormData>({
+    defaultValues: {
+      title: type === "edit" && editTarget ? editTarget.title : "",
+      time: type === "edit" && editTarget ? editTarget.time : 0,
+    },
+  });
 
   const onSubmit = (data: FormData) => {
     onSubmitForm(data);
@@ -93,18 +108,21 @@ const Modal = memo(({ onClose, onSubmitForm }: Props) => {
 
   return (
     <ToastDiv className="toast">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <p>新規登録</p>
+      <form onSubmit={handleSubmit(onSubmit)} data-testid="registration-form">
+        <p data-testid="model-title">
+          {type === "add" ? "新規登録" : "記録編集"}
+        </p>
         <label>
           <p>学習内容</p>
           <input
+            defaultValue={type === "edit" && editTarget ? editTarget.title : ""}
             {...register("title", {
-              required: "内容の入力は必須です",
+              required: "学習内容の入力は必須です",
             })}
             placeholder="学習した内容を入力してください"
           />
           {formState.errors.title && (
-            <p className="error" data-testid="title-error-message">
+            <p className="error" data-testid="error-title-message">
               {formState.errors.title.message}
             </p>
           )}
@@ -114,23 +132,27 @@ const Modal = memo(({ onClose, onSubmitForm }: Props) => {
           <input
             type="number"
             {...register("time", {
-              required: "時間の入力は必須です",
+              required: "学習時間の入力は必須です",
               min: {
                 value: 1,
-                message: "数値は1以上である必要があります",
+                message: "学習時間は1以上である必要があります",
               },
             })}
             placeholder="学習した時間を入力してください"
           />
           {formState.errors.time && (
-            <p className="error" data-testid="time-error-message">
+            <p className="error" data-testid="error-time-message">
               {formState.errors.time.message}
             </p>
           )}
         </label>
         <div className="button">
-          <button>登録</button>
-          <span onClick={onClose}>閉じる</span>
+          <button data-testid="send-button">
+            {type === "add" ? "登録" : "更新"}
+          </button>
+          <span onClick={onClose} data-testid="back-button">
+            閉じる
+          </span>
         </div>
       </form>
     </ToastDiv>
