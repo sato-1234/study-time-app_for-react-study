@@ -31,10 +31,6 @@ const Signout = memo(() => {
   // ログインしていない場合、ログインページにリダイレクト
   if (!user) return <Navigate replace to="/signin" />;
 
-  /* 残りタスク 
-      ③、signup関数で.env読み出せれレスポンスで丸見えなので、Next.js等の対策がいると思う
-  */
-
   return <SignupDiv>ログアウト中です...</SignupDiv>;
 });
 

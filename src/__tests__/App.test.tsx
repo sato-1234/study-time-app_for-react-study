@@ -12,6 +12,7 @@ import { Study } from "../domain/study";
 import { vi } from "vitest";
 import { randomUUID } from "crypto";
 import App from "../App";
+import { fail } from "assert";
 
 // ------------------------------
 // useAuthをモックしてログイン済みにする。
@@ -40,14 +41,14 @@ const firstListLength = firstList.length;
 
 // リストに追加する値
 const inputStudyValue3: string = "追加された学習103";
-const inputStudyTime3: string = "3";
+const inputStudyTime3: number = 3;
 const inputStudyValue4: string = "追加された学習104";
-const inputStudyTime4: string = "4";
+const inputStudyTime4: number = 4;
 const waitTimeout: number = 1000; //追加と削除時にまつ最大秒数
 
 // リストを更新する値
 const updateStudyValue: string = "更新された学習105";
-const updateStudyTime: string = "5";
+const updateStudyTime: number = 5;
 
 // mock 初回リストの値をセットして取得できるようにする
 const mockStudyStore = new Map<string, Study>();
@@ -156,7 +157,7 @@ const getList = (): TypeGetList => {
 // 更新用は1回使用しないため共通関数なし
 type TypeAddList = {
   inputStudyValue: string;
-  inputStudyTime: string;
+  inputStudyTime: number;
   button: HTMLElement;
 };
 const addList = async ({
@@ -168,7 +169,7 @@ const addList = async ({
     button
   );
   await user.type(inputElText, inputStudyValue);
-  await user.type(inputElNumber, inputStudyTime);
+  await user.type(inputElNumber, String(inputStudyTime));
   if (sendButton) await user.click(sendButton);
 };
 
@@ -186,17 +187,17 @@ const waitForListLengthChange = async (
         (num == 0 && type === "add") ||
         (num == 0 && type === "minus" && previousLength >= 2)
       ) {
-        throw new Error(
+        fail(
           "tbodyが存在しません。時間「timeout: XXXX」を増やしして再実行してください"
         );
       }
 
       if (num == previousLength && type !== "same") {
-        throw new Error(
+        fail(
           "リスト件数前後に変化がありません。時間「timeout: XXXX」を増やして再実行してください"
         );
       } else if (num != previousLength && type === "same") {
-        throw new Error(
+        fail(
           "リスト件数前後に変化があります。バリエーションエラーの際にリストに影響がでております。コードを修正してください"
         );
       }
@@ -217,10 +218,10 @@ const getLastList = (trs: HTMLElement[]): TypeGetLastList => {
     if (lastId) {
       return { lastItem, lastId };
     } else {
-      throw new Error("key=idが取得できませんでした。");
+      fail("key=idが取得できませんでした。");
     }
   } else {
-    throw new Error("trsが0個です。");
+    fail("trsが0個です。");
   }
 };
 
@@ -229,7 +230,7 @@ describe("Appコンポーネントの動作確認", () => {
 
   // 各テストの共通の初期化（クリーン処理は「vitest.setup.ts」に記載済み）
   // let debug: () => void; // デバック用
-  beforeEach(async () => {
+  beforeEach(() => {
     mockStudyStore.clear(); // 各テスト前にリセット
     // Homeのパスへ移動してレンダリングする。以下で指定パスでテスト可能
     // window.history.pushState({}, "", "/signu");
@@ -292,7 +293,7 @@ describe("Appコンポーネントの動作確認", () => {
       // テストデータ登録 → 待つ → 再リスト取得 → 値チェック → 現在リスト数表示
       const checkAddList = async (
         inputStudyValue: string,
-        inputStudyTime: string,
+        inputStudyTime: number,
         previousLength: number
       ) => {
         // テストデータを登録する（自動でモーダル閉じる）
@@ -340,7 +341,7 @@ describe("Appコンポーネントの動作確認", () => {
 
           return num;
         } else {
-          throw new Error("登録後はリストは存在するはずですがリストが0個です");
+          fail("登録後はリストは存在するはずですがリストが0個です");
         }
       };
 
@@ -380,7 +381,7 @@ describe("Appコンポーネントの動作確認", () => {
           const button = within(lastItem).getByTestId("delete-list");
           await user.click(button);
         } else {
-          throw new Error("リストが1件ある状態で、削除を実行してください");
+          fail("リストが1件ある状態で、削除を実行してください");
         }
 
         // リストがへるのを待つ
@@ -485,7 +486,7 @@ describe("Appコンポーネントの動作確認", () => {
       if (lastItemBefore != null) {
         button = within(lastItemBefore).getByTestId("edit-list");
       } else {
-        throw new Error("リストが1件ある状態で、更新ボタンを押下してください");
+        fail("リストが1件ある状態で、更新ボタンを押下してください");
       }
 
       // 更新用モーダル情報取得
@@ -508,7 +509,7 @@ describe("Appコンポーネントの動作確認", () => {
       await user.clear(inputElText); //一旦クリア（クリアしないと末に追加になる）
       await user.clear(inputElNumber);
       await user.type(inputElText, updateStudyValue);
-      await user.type(inputElNumber, updateStudyTime);
+      await user.type(inputElNumber, String(updateStudyTime));
       if (sendButton) await user.click(sendButton); //自動でモーダル閉じる
 
       // リスト数チャック（変換なしか）

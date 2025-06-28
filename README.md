@@ -3,7 +3,10 @@
 **Qiita 記事**
 https://qiita.com/Sicut_study/items/7d8c6f309dddda1a3961
 
-の課題内容にそって、アウトプットしました。
+の課題内容にそって、アウトプットしました。そのため不要なコメントも残しています。
+
+**デプロイ 先**
+https://study-time-app-44d91.firebaseapp.com/
 
 ## 2025/06/14：課題１ 完了
 
@@ -82,15 +85,15 @@ npm i react-hook-form
 npm i lucide-react
 ```
 
-Supabase 上のテーブル名「study_record」にテストデータを Delete
-（テストデータかつ削除してよい場合。削除許可がない場合は気軽に以下の SQL を使用しないように）
+Supabase 上のテーブル名「study_record」のテストデータを Delete
+（削除許可がない場合は気軽に以下の SQL を使用しないように）
 
 ```
 DELETE FROM study_record;
 ```
 
-「study_record」に外部キーや RLS を有効にしてポリシーの設定をする
-(すべて「not null」。Foreign key は「user_id → auth.users.id」)
+「study_record」に外部キーと RLS を有効にしてポリシーの設定をする。
+カラムすべて「not null」。Foreign key は「user_id → auth.users.id」
 
 | column_name | data_type                | other                   |
 | ----------- | ------------------------ | ----------------------- |

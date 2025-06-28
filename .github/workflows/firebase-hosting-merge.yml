@@ -11,7 +11,7 @@ permissions:
   contents: read # 修正いるかも（削除したらがデフォルト「read/write」になるらしい）
 jobs:
   build_and_deploy:
-    if: false # FireBaseを公開したらこの行を削除する
+    #if: false # デプロイしない場合、この行のコメントは外す
     runs-on: ubuntu-latest
 
     steps:

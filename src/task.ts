@@ -1,9 +1,9 @@
-type TasksType = {
+type TaskType = {
   check: boolean;
   content: string;
 };
 
-export const taskOne: TasksType[] = [
+export const taskOne: TaskType[] = [
   { check: true, content: "Viteを利用してReact環境を用意する" },
   { check: true, content: "タイトル「学習記録一覧」を表示させる" },
   { check: true, content: "テストデータ（records）を一覧で表示する" },
@@ -32,7 +32,7 @@ export const taskOne: TasksType[] = [
   { check: true, content: "記録した勉強の時間を合計した値を表示する" },
 ];
 
-export const taskTwo: TasksType[] = [
+export const taskTwo: TaskType[] = [
   { check: true, content: "Supabaseのプロジェクトを作成する" },
   {
     check: true,
@@ -90,7 +90,7 @@ export const taskTwo: TasksType[] = [
   },
 ];
 
-export const taskThree: TasksType[] = [
+export const taskThree: TaskType[] = [
   {
     check: false,
     content: "ChakuraUIを導入する",

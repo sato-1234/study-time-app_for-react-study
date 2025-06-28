@@ -198,14 +198,15 @@ const Home = memo(() => {
           ? await createStudy(data.title, data.time)
           : await editStudy(editTarget!.id, data.title, data.time);
 
-      setList(
+      // prevを使用することでlistに依存しなくてよくなる
+      setList((prev) =>
         modalType === "add"
-          ? [...list, res]
-          : list.map((item) => (item.id === res.id ? res : item))
+          ? [...prev, res]
+          : prev.map((item) => (item.id === res.id ? res : item))
       );
       setToastOpen(false);
     },
-    [list, modalType, editTarget]
+    [modalType, editTarget]
   );
 
   // ログインしていない場合、ログインページにリダイレクト
@@ -246,12 +247,11 @@ const Home = memo(() => {
       try {
         const res = await deleteStudy(id);
         //一致しないIDすべて
-        setList(list.filter((v) => v.id !== res.id));
+        //setList(list.filter((v) => v.id !== res.id));
+        setList((prev) => prev.filter((v) => v.id !== res.id));
       } catch (err) {
         console.error(err);
         alert("削除に失敗しました。");
-      } finally {
-        setLoading(false);
       }
     }
   };
