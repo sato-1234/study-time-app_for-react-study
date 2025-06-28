@@ -23,5 +23,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Set environment variables
+        run: |
+          echo "VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL_STUDY_TIME_APP }}" >> .env
+          echo "VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_STUDY_TIME_APP }}" >> .env
+
       - name: test run
         run: npm run test

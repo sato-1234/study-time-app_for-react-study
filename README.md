@@ -5,7 +5,7 @@ https://qiita.com/Sicut_study/items/7d8c6f309dddda1a3961
 
 の課題内容にそって、アウトプットしました。そのため不要なコメントも残しています。
 
-**デプロイ 先**
+**デプロイ先**
 https://study-time-app-44d91.firebaseapp.com/
 
 ## 2025/06/14：課題１ 完了
@@ -22,7 +22,7 @@ npm run dev
 ## 2025/06/20 ：課題２ 完了
 
 Supabase 上でテーブル名「study_record」作成
-(ポリシーは一旦全ユーザー許可：RLS を無効)
+(ポリシーは一旦全ユーザー許可)
 
 | column_name | data_type     | other        |
 | ----------- | ------------- | ------------ |
